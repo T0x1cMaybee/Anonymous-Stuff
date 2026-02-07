@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anonymous Stuff</title>
+
+
+
+<script>
+  document.documentElement.classList.add('js');
+</script>
+
+
+<style>
+
+/* ===== Click / press bounce animation ===== */
+@keyframes pressPop{
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(1px) scale(0.96); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Make clickable things feel clickable */
+.mini, .glassPill, .linkRow, .wn-close{
+  cursor: none !important; /* keep your vibe */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Press state (works for mouse click) */
+.mini:active, .glassPill:active, .linkRow:active, .wn-close:active{
+  animation: pressPop 160ms ease-out;
+}
+
+/* JS-triggered press (works for keyboard too) */
+.pressed{
+  animation: pressPop 160ms ease-out;
+}
+
+/* Optional: tiny “tap glow” */
+.mini:active{
+  filter: brightness(1.08);
+}
+
+/* ===== Safe intro animation (no flick) ===== */
+@keyframes introUp{
+  from{ opacity:0; transform: translateY(12px); filter: blur(6px); }
+  to  { opacity:1; transform: translateY(0);    filter: blur(0); }
+}
+
+/* Default visible if JS is off */
+.wrap, .hero, .utility, .grid{ opacity:1; transform:none; filter:none; }
+
+/* Animate only when JS is on (and it starts hidden immediately because js class is added in <head>) */
+html.js .hero{
+  opacity:0;
+  animation: introUp 650ms cubic-bezier(.2,.8,.2,1) 60ms both;
+}
+html.js .utility{
+  opacity:0;
+  animation: introUp 650ms cubic-bezier(.2,.8,.2,1) 130ms both;
+}
+html.js .grid{
+  opacity:0;
+  animation: introUp 720ms cubic-bezier(.2,.8,.2,1) 200ms both;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html.js .hero, html.js .utility, html.js .grid{
+    opacity:1 !important;
+    animation:none !important;
+    transform:none !important;
+    filter:none !important;
+  }
+}
+
+  :root{
+    --bg: #050608;
+    --text: rgba(255,255,255,0.92);
+    --muted: rgba(255,255,255,0.60);
+
+    /* glass / chrome */
+    --border: rgba(255,255,255,0.14);
+
+    /* glow */
+    --glow: rgba(255,255,255,0.38);
+
+    --radius: 18px;
+  }
+
+/* ===== Safe intro animation (won't blank page if JS fails) ===== */
+@keyframes introUp {
+  from { opacity: 0; transform: translateY(12px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+/* Default = visible */
+.wrap, .hero, .utility, .grid { opacity: 1; }
+
+/* Only animate when JS is enabled */
+html.js .wrap{
+  opacity: 0;
+  animation: introUp 700ms cubic-bezier(.2,.8,.2,1) 40ms forwards;
+}
+html.js .hero{
+  opacity: 0;
+  animation: introUp 700ms cubic-bezier(.2,.8,.2,1) 90ms forwards;
+}
+html.js .utility{
+  opacity: 0;
+  animation: introUp 700ms cubic-bezier(.2,.8,.2,1) 140ms forwards;
+}
+html.js .grid{
+  opacity: 0;
+  animation: introUp 760ms cubic-bezier(.2,.8,.2,1) 200ms forwards;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html.js .wrap, html.js .hero, html.js .utility, html.js .grid{
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+  /* No blue highlight/selection anywhere */
+  *::selection{ background: transparent; }
+  *::-moz-selection{ background: transparent; }
+  *{ -webkit-tap-highlight-color: transparent; }
+
+  *{ box-sizing:border-box; cursor:none !important; }html, body{
+  overflow-x: hidden !important;
+  width: 100%;
+  margin: 0;
+}
+
+/* Hide scrollbars but keep scrolling */
+html, body{
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* old Edge/IE */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+  width: 0;
+  height: 0;
+}
+
+  body{
+    margin:0;
+    color:var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1000px 700px at 70% 15%, rgba(255,255,255,0.06), transparent 55%),
+      radial-gradient(900px 700px at 18% 70%, rgba(255,255,255,0.05), transparent 55%),
+      radial-gradient(800px 600px at 85% 80%, rgba(255,255,255,0.035), transparent 55%),
+      var(--bg);
+    overflow-x: hidden;
+overflow-y: auto;
+
+  }
+
+  .smooth, .smooth *{
+    transition: transform .18s ease, opacity .18s ease, background-color .18s ease,
+                border-color .18s ease, box-shadow .18s ease, filter .18s ease;
+  }
+
+  #fx{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.95;
+  }
+
+.grain{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:0.12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size:220px 220px;
+  background-position: 0 0;
+  mix-blend-mode: overlay;
+  animation: drift 10s linear infinite;
+}
+
+@keyframes drift{
+  from{ background-position: 0 0; }
+  to  { background-position: 40px -30px; }
+}
+
+
+  /* Cursor: dot only (instant) */
+  .cursor{
+    position:fixed;
+    top:0; left:0;
+    width:8px; height:8px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.98);
+    transform: translate(-50%, -50%);
+    pointer-events:none;
+    z-index:9999;
+    box-shadow: 0 0 14px var(--glow), 0 0 34px rgba(255,255,255,0.18);
+    will-change: transform;
+    transition: none !important; /* no cursor lag */
+  }
+
+  /* Layout */
+  .wrap{
+    position:relative;
+    z-index:2;
+    min-height:100%;
+    padding: 52px 18px 44px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 22px;
+  }
+
+  /* Full HD / wide screens: more breathing room */
+  @media (min-width: 1100px){
+    .wrap{ padding: 62px 22px 52px; gap: 24px; }
+  }
+
+  .hero{
+    text-align:center;
+    max-width: 980px;
+    padding: 10px 10px 0;
+  }
+  .hero h1{
+    margin:0;
+    font-size: clamp(34px, 5vw, 62px);
+    letter-spacing: 1.8px;
+    font-weight: 850;
+    color: rgba(255,255,255,0.96);
+    text-shadow:
+      0 0 18px rgba(255,255,255,0.22),
+      0 0 46px rgba(255,255,255,0.12);
+  }
+  .hero p{
+    margin: 10px auto 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height:1.5;
+    max-width: 680px;
+  }
+
+  .utility{
+    width: min(1200px, 100%);
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  .glassPill{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transform: translateY(0);
+  }
+  .glassPill .icon{ opacity:0.75; user-select:none; }
+
+  /* Search pill hover + focus animation */
+  .glassPill:hover{
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.20);
+    background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+    box-shadow: 0 16px 52px rgba(0,0,0,0.45);
+  }
+  .glassPill:focus-within{
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.26);
+    background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+    box-shadow:
+      0 18px 60px rgba(0,0,0,0.52),
+      0 0 0 1px rgba(255,255,255,0.12),
+      0 0 26px rgba(255,255,255,0.10);
+  }
+
+  .search{
+    border:none;
+    outline:none;
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    width: 360px;
+    max-width: 80vw;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* Grid of site columns */
+  .grid{
+    width: min(1200px, 100%);
+    display:grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+    padding-top: 2px;
+  }
+
+  /* Default: 3 columns across (HD friendly) */
+  .col{ grid-column: span 4; }
+
+  /* Wide: 4 columns across */
+  @media (min-width: 1320px){
+    .grid{ width: min(1400px, 100%); }
+    .col{ grid-column: span 3; }
+  }
+
+  /* Tablet */
+  @media (max-width: 980px){
+    .col{ grid-column: span 6; }
+  }
+  /* Phone */
+  @media (max-width: 680px){
+    .col{ grid-column: span 12; }
+  }
+
+  .col{
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,0.14);
+
+    /* more clear/see-through glass */
+    background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+
+    box-shadow:
+      0 18px 60px rgba(0,0,0,0.48),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    position:relative;
+    overflow:hidden;
+  }
+
+  .col::before{
+    content:"";
+    position:absolute;
+    inset:-40%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.10), transparent 50%);
+    transform: rotate(12deg);
+    pointer-events:none;
+  }
+
+  .col:hover{
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.22);
+    background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.030));
+  }
+
+  .colInner{
+    position:relative;
+    padding: 14px 14px 12px;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+
+  .colTop{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .groupTitle{
+    margin:0;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    font-size: 14px;
+    line-height:1.1;
+    color: rgba(255,255,255,0.96);
+  }
+
+  /* per-column accent glow */
+  .accent{
+    color: rgb(var(--accent));
+    text-shadow:
+      0 0 10px rgba(var(--accent), 0.55),
+      0 0 28px rgba(var(--accent), 0.22),
+      0 0 52px rgba(var(--accent), 0.12);
+  }
+
+  .badge{
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: rgba(255,255,255,0.60);
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(0,0,0,0.10);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    user-select:none;
+  }
+
+  .links{
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 2px;
+  }
+
+  .linkRow{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.10);
+  }
+
+  .linkRow:hover{
+    border-color: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .linkText{
+    min-width:0;
+    display:flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .linkName{
+    font-size: 12px;
+    color: rgba(255,255,255,0.72);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+
+  .linkUrl{
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mini{
+    padding: 9px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(0,0,0,0.12);
+    user-select:none;
+    font-size: 12px;
+    display:flex;
+    align-items:center;
+    gap: 7px;
+    flex: 0 0 auto;
+  }
+  .mini:hover{
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.20);
+  }
+
+  .footer{
+    width: min(1200px, 100%);
+    display:flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap:wrap;
+    margin-top: 6px;
+    color: rgba(255,255,255,0.46);
+    font-size: 12px;
+  }
+
+  .empty{
+    grid-column: span 12;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,0.14);
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 18px;
+    text-align:center;
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* ===========================
+     WHAT'S NEW POPUP (modal)
+     =========================== */
+  .wn-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0,0,0,0.60);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .wn-overlay.show{ display:flex; }
+
+  .wn-modal{
+    width: min(520px, 100%);
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    box-shadow: 0 30px 90px rgba(0,0,0,0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    transform: translateY(0);
+  }
+
+  .wn-top{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  .wn-left{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .wn-icon{
+    width: 26px; height: 26px;
+    display:grid; place-items:center;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(0,0,0,0.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    user-select:none;
+  }
+  .wn-title{
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    color: rgba(255,255,255,0.94);
+    white-space: nowrap;
+  }
+  .wn-pill{
+    margin-left: 6px;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.78);
+    user-select:none;
+    white-space: nowrap;
+  }
+  .wn-close{
+    width: 34px; height: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(0,0,0,0.18);
+    display:grid; place-items:center;
+    user-select:none;
+  }
+  .wn-close:hover{
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.20);
+    transform: translateY(-1px);
+  }
+
+  .wn-body{
+    padding: 14px;
+  }
+  .wn-label{
+    font-size: 11px;
+    letter-spacing: 1.1px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 800;
+  }
+
+  .wn-card{
+    margin-top: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.16);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    padding: 12px;
+  }
+  .wn-item{
+    position: relative;
+    padding: 10px 10px 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.04);
+  }
+  .wn-item + .wn-item{ margin-top: 10px; }
+
+  .wn-item::before{
+    content:"";
+    position:absolute;
+    left: 8px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.55);
+    box-shadow: 0 0 12px rgba(255,255,255,0.18);
+  }
+
+  .wn-text{
+    font-size: 13px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.45;
+    margin-left: 10px;
+  }
+  .wn-date{
+    margin-top: 8px;
+    text-align: right;
+    font-size: 11px;
+    color: rgba(255,255,255,0.40);
+  }
+</style>
+</head>
+
+<body class="smooth">
+  <canvas id="fx"></canvas>
+  <div class="grain"></div>
+
+  <div class="cursor" id="cur"></div>
+
+  <main class="wrap">
+    <div class="hero">
+      <h1>Anonymous Stuff</h1>
+      <p>Go through the endless sites for "studying" purposes.</p>
+    </div>
+
+    <div class="utility">
+      <div class="glassPill" title="Search groups or links">
+        <span class="icon">⌕</span>
+        <input id="q" class="search" placeholder="Search site name or link..." autocomplete="off" />
+      </div>
+      <div class="glassPill" id="countPill">
+        <span class="icon">◦</span><span id="count">0 sites</span>
+      </div>
+    </div>
+
+    <section class="grid" id="grid"></section>
+
+
+  </main>
+
+  <!-- ============= What's New popup ============= -->
+  <div class="wn-overlay" id="wnOverlay" aria-hidden="true">
+    <div class="wn-modal" role="dialog" aria-modal="true" aria-labelledby="wnTitle">
+      <div class="wn-top">
+        <div class="wn-left">
+          <div class="wn-icon" aria-hidden="true">📣</div>
+          <div class="wn-title" id="wnTitle">What’s New</div>
+          <div class="wn-pill">Temporary announcement</div>
+        </div>
+        <div class="wn-close" id="wnClose" role="button" tabindex="0" aria-label="Close">
+          ✕
+        </div>
+      </div>
+
+      <div class="wn-body">
+        <div class="wn-label">CHANGELOG</div>
+
+        <div class="wn-card">
+          <div class="wn-item">
+            <div class="wn-text">Site’s fully released.</div>
+            <div class="wn-date">Feb 5, 2026</div>
+          </div>
+
+          <div class="wn-item">
+            <div class="wn-text">ha ha ha, have fun trying to block me, Lightspeed 😂</div>
+            <div class="wn-date">Feb 5, 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- =========================================== -->
+
+<script>
+  // ====== YOUR SITE COLUMNS ======
+  const SITES = [
+{
+  title: "Void Network V5",
+  accent: "255, 255, 255",
+  links: [
+    { label: "Void Link 1", url: "https://gov.proyectojusticia.com.mx/" },
+    { label: "Void Link 2", url: "https://chemistrypracticelab.cencopro.cl/" },
+    { label: "Void Link 3", url: "https://read.gryk.de/" }
+  ]
+},
+
+    {
+      title: "OverCloaked",
+      accent: "255, 255, 255",
+      links: [
+        { label: "OverCloaked Link 1", url: "https://history.stonestackstrategies.com/" },
+        { label: "OverCloaked Link 2", url: "https://science.plik-perm.ru/" },
+        { label: "OverCloaked Link 3", url: "https://math.pcrage2000.com/" },
+        { label: "OverCloaked Link 4", url: "https://physical-education.aura-alcove.com/" }
+      ]
+    },
+    {
+      title: "Infamous",
+      accent: "255, 255, 255",
+      links: [
+        { label: "Infamous Link 1", url: "https://infamous-tutoring.space/" },
+        { label: "Infamous Link 2", url: "https://u8q7m3f9.mendozaski.com/" },
+        { label: "Infamous Link 3", url: "https://m9f8q3r7.mendozaski.com/" },
+        { label: "Infamous Link 4", url: "https://7a2x9rbm.mendozaski.com/" },
+        { label: "Infamous Link 5", url: "https://m8qf3r9u.mendozaski.com/" }
+      ]
+    },
+    {
+    title: "Galaxy V6",
+    accent: "107, 146, 189",
+    links: [
+      { label: "Galaxy Link 1", url: "https://catprincehq.nightlightresearch.com/onboarding/" },
+      { label: "Galaxy Link 2", url: "https://science.nightlightresearch.com/onboarding/" },
+      { label: "Galaxy Link 3", url: "https://night.nightlightresearch.com/onboarding/" },
+      { label: "Galaxy Link 4", url: "https://huge-deer.nightlightresearch.com/onboarding/" },
+      { label: "Galaxy Link 5", url: "https://realisethetruth.realisation.org/onboarding/" }
+    ]
+  },
+{
+  title: "Petezah",
+  accent: "37, 150, 190",
+  links: [
+    { label: "Petezah Link 1", url: "https://jobworld.cc/" },
+    { label: "Petezah Link 2", url: "https://info.hotelsunrisegrand.com/" }
+  ]
+},
+
+{
+  title: "Fern",
+  accent: "255, 255, 255",
+  links: [
+    { label: "Fern Link 1", url: "https://canvasbackpackstore.com/" },
+    { label: "Fern Link 2", url: "https://hakoda.wtf/" },
+    { label: "Fern Link 3", url: "https://mcps.mcpsresources.com/" }
+  ]
+},
+{
+  title: "UniUB V4",
+  accent: "165, 90, 210", // purple-pink (more purple)
+  links: [
+    { label: "UniUB Link 1", url: "https://learnaboutbillclinton.cencopro.cl/#home" },
+    { label: "UniUB Link 2", url: "https://aphistorytutoring.bisblick.org/#home" },
+    { label: "UniUB Link 3", url: "https://learnaboutbillclinton.bisblick.org/#home" }
+  ]
+},
+{
+  title: "Rosin",
+  accent: "255, 255, 255", // white
+  links: [
+    { label: "Rosin Link 1", url: "https://been-back.interluxvs.com/" },
+    { label: "Rosin Link 2", url: "https://slayercrazy.realisation.org/" },
+    { label: "Rosin Link 3", url: "https://hosting.verbodegroup.com/" },
+    { label: "Rosin Link 4", url: "https://slayer.sieuthitpcn.com/" },
+    { label: "Rosin Link 5", url: "https://been-back.sieuthitpcn.com/" },
+    { label: "Rosin Link 6", url: "https://many-men.bienaldeescuch.ar/" }
+  ]
+}
+
+
+
+  ];
+
+  const grid = document.getElementById("grid");
+  const q = document.getElementById("q");
+  const statusEl = document.getElementById("status");
+  const countEl = document.getElementById("count");
+
+  function setStatus(msg){
+    statusEl.textContent = msg;
+    clearTimeout(setStatus.t);
+    setStatus.t = setTimeout(()=> statusEl.textContent = "Ready.", 1200);
+  }
+
+  function normalize(s){ return (s || "").toLowerCase().trim(); }
+
+  function siteMatches(site, query){
+    if(!query) return true;
+    const t = (site.title || "").toLowerCase();
+    if(t.includes(query)) return true;
+    for(const l of (site.links || [])){
+      const hay = `${l.label || ""} ${l.url || ""}`.toLowerCase();
+      if(hay.includes(query)) return true;
+    }
+    return false;
+  }
+
+  function render(){
+    const query = normalize(q.value);
+    grid.innerHTML = "";
+
+    const filteredSites = SITES.filter(s => siteMatches(s, query));
+    countEl.textContent = `${filteredSites.length} ${filteredSites.length === 1 ? "site" : "sites"}`;
+
+    if(filteredSites.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "No matches. Clear the search to show everything again.";
+      grid.appendChild(empty);
+      return;
+    }
+
+    for(const site of filteredSites){
+      const col = document.createElement("div");
+      col.className = "col";
+      col.style.setProperty("--accent", site.accent || "255,255,255");
+
+      const linkCount = (site.links || []).length;
+
+      const inner = document.createElement("div");
+      inner.className = "colInner";
+
+      const top = document.createElement("div");
+      top.className = "colTop";
+
+      const title = document.createElement("h3");
+      title.className = "groupTitle accent";
+      title.textContent = site.title || "Untitled";
+
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = `${linkCount} ${linkCount === 1 ? "link" : "links"}`;
+
+      top.appendChild(title);
+      top.appendChild(badge);
+
+      const linksWrap = document.createElement("div");
+      linksWrap.className = "links";
+
+      for(const l of (site.links || [])){
+        const row = document.createElement("div");
+        row.className = "linkRow";
+
+        const left = document.createElement("div");
+        left.className = "linkText";
+
+        const ln = document.createElement("div");
+        ln.className = "linkName";
+        ln.textContent = l.label || "Link";
+
+        const lu = document.createElement("div");
+        lu.className = "linkUrl";
+        lu.textContent = l.url || "";
+
+        left.appendChild(ln);
+        left.appendChild(lu);
+
+        const actions = document.createElement("div");
+        actions.style.display = "flex";
+        actions.style.gap = "8px";
+
+        const openBtn = document.createElement("div");
+        openBtn.className = "mini";
+        openBtn.role = "button";
+        openBtn.tabIndex = 0;
+        openBtn.innerHTML = `<span style="opacity:.75;">↗</span>Open`;
+        openBtn.addEventListener("click", ()=> window.open(l.url, "_blank", "noopener"));
+
+        const copyBtn = document.createElement("div");
+        copyBtn.className = "mini";
+        copyBtn.role = "button";
+        copyBtn.tabIndex = 0;
+        copyBtn.innerHTML = `<span style="opacity:.75;">⧉</span>Copy`;
+        copyBtn.addEventListener("click", async ()=>{
+          try{
+            await navigator.clipboard.writeText(l.url);
+            setStatus("Copied link.");
+          }catch{
+            setStatus("Copy blocked by browser.");
+          }
+        });
+
+        actions.appendChild(openBtn);
+        actions.appendChild(copyBtn);
+
+        row.appendChild(left);
+        row.appendChild(actions);
+        linksWrap.appendChild(row);
+      }
+
+      inner.appendChild(top);
+      inner.appendChild(linksWrap);
+      col.appendChild(inner);
+      grid.appendChild(col);
+    }
+  }
+
+  q.addEventListener("input", render);
+
+  // Cursor: dot only, INSTANT (no smoothing / no lag)
+  const cur = document.getElementById("cur");
+  window.addEventListener("mousemove", (e)=>{
+    cur.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%,-50%)`;
+  }, { passive: true });
+
+  window.addEventListener("mouseleave", ()=> cur.style.opacity = "0");
+  window.addEventListener("mouseenter", ()=> cur.style.opacity = "1");
+
+  // ===== What's New popup logic =====
+  const WN_VERSION = "wn_v1"; // bump this if you want it to show again in the future
+  const wnOverlay = document.getElementById("wnOverlay");
+  const wnClose = document.getElementById("wnClose");
+
+  function openWN(){
+    wnOverlay.classList.add("show");
+    wnOverlay.setAttribute("aria-hidden", "false");
+  }
+  function closeWN(){
+    wnOverlay.classList.remove("show");
+    wnOverlay.setAttribute("aria-hidden", "true");
+    try{ localStorage.setItem("wn_seen", WN_VERSION); }catch{}
+  }
+
+  // Show on first visit (per version)
+  try{
+    if(localStorage.getItem("wn_seen") !== WN_VERSION){
+      setTimeout(openWN, 300);
+    }
+  }catch{
+    setTimeout(openWN, 300);
+  }
+
+  wnClose.addEventListener("click", closeWN);
+  wnClose.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); closeWN(); }
+  });
+
+  // Click outside to close
+  wnOverlay.addEventListener("click", (e)=>{
+    if(e.target === wnOverlay) closeWN();
+  });
+
+  // ESC to close
+  window.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && wnOverlay.classList.contains("show")) closeWN();
+  });
+
+  // ===== Particles + connecting lines (Canvas) =====
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d", { alpha: true });
+  let W=0, H=0, dpr=1;
+
+  function resize(){
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    W = canvas.width = Math.floor(innerWidth * dpr);
+    H = canvas.height = Math.floor(innerHeight * dpr);
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+  }
+
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  function desiredCount(){
+    return Math.min(110, Math.floor((innerWidth*innerHeight) / 16000) + 40);
+  }
+
+  let pts = [];
+  function init(){
+    const COUNT = desiredCount();
+    pts = [];
+    for(let i=0;i<COUNT;i++){
+      pts.push({
+        x: rand(0,W),
+        y: rand(0,H),
+        vx: rand(-0.35,0.35) * dpr,
+        vy: rand(-0.35,0.35) * dpr,
+        r: rand(0.8,1.8) * dpr
+      });
+    }
+  }
+
+  resize();
+  init();
+
+  let resizeTimer = null;
+  addEventListener("resize", ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(()=>{ resize(); init(); }, 120);
+  });
+
+  function step(){
+    ctx.clearRect(0,0,W,H);
+
+    const g = ctx.createRadialGradient(W*0.5,H*0.45,0,W*0.5,H*0.55,Math.max(W,H)*0.7);
+    g.addColorStop(0, "rgba(255,255,255,0.035)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    for(const p of pts){
+      p.x += p.vx;
+      p.y += p.vy;
+      if(p.x < -40 || p.x > W+40) p.vx *= -1;
+      if(p.y < -40 || p.y > H+40) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    const maxDist = 140 * dpr;
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const a = pts[i], b = pts[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.hypot(dx,dy);
+        if(dist < maxDist){
+          const alpha = (1 - dist/maxDist) * 0.18;
+          ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+          ctx.lineWidth = 1 * dpr * 0.6;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+  step();
+
+  render();
+</script>
+</body>
+</html>
